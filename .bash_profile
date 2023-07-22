@@ -1,6 +1,3 @@
-#gpgconf --reload gpg-agent
-#gpg-agent --max-cache-ttl 999999
-
 # Aliases
 alias reload="source ~/.bash_profile"
 alias pnpm_update="powershell -Command \"iwr https://get.pnpm.io/install.ps1 -useb | iex\" && pnpm -v"
