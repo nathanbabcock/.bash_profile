@@ -2,8 +2,6 @@
 #gpg-agent --max-cache-ttl 999999
 
 # Aliases
-#alias npm="echo -e '\033[0;34mUse pnpm ;)'; echo '...or use alias: oldnpm'"
-#alias oldnpm="$(which npm)"
 alias reload="source ~/.bash_profile"
 alias pnpm_update="powershell -Command \"iwr https://get.pnpm.io/install.ps1 -useb | iex\" && pnpm -v"
 alias pnpmx="pnpm --exec"
