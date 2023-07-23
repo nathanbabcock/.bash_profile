@@ -9,3 +9,6 @@ eval "$(starship init bash)"
 
 # https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 echo -e "\033[0;34mBash profile loaded."
+
+# scrcpy
+alias mirror="scrcpy --tcpip=192.168.1.71:5555 --turn-screen-off --stay-awake --power-off-on-close"
