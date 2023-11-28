@@ -33,3 +33,6 @@ alias newnode="pnpm env use latest --global"
 
 # https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 echo -e "\033[0;34mBash profile loaded."
+
+# Fix Steam "Disk Write Error"
+alias fixsteam="rm -rfv D:/SteamLibrary/steamapps/downloading/*"
