@@ -78,7 +78,6 @@ function git-diff-grep() {
   return 0
 }
 
-
 # Starship shell prompt - https://starship.rs
 eval "$(starship init bash)"
 
@@ -103,6 +102,39 @@ export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 # Atuin history search & sync
 [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
 eval "$(atuin init bash --disable-up-arrow)"
+
+###-begin-pnpm-completion-###
+if type complete &>/dev/null; then
+  _pnpm_completion () {
+    local words cword
+    if type _get_comp_words_by_ref &>/dev/null; then
+      _get_comp_words_by_ref -n = -n @ -n : -w words -i cword
+    else
+      cword="$COMP_CWORD"
+      words=("${COMP_WORDS[@]}")
+    fi
+
+    local si="$IFS"
+    IFS=$'\n' COMPREPLY=($(COMP_CWORD="$cword" \
+                           COMP_LINE="$COMP_LINE" \
+                           COMP_POINT="$COMP_POINT" \
+                           SHELL=bash \
+                           pnpm completion-server -- "${words[@]}" \
+                           2>/dev/null)) || return $?
+    IFS="$si"
+
+    if [ "$COMPREPLY" = "__tabtab_complete_files__" ]; then
+      COMPREPLY=($(compgen -f -- "$cword"))
+    fi
+
+    if type __ltrim_colon_completions &>/dev/null; then
+      __ltrim_colon_completions "${words[cword]}"
+    fi
+  }
+  complete -o default -F _pnpm_completion p # completions enabled for `p` alias
+fi
+###-end-pnpm-completion-###
+
 
 # https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 echo -e "\033[0;34mBash profile loaded.\033[0m"
