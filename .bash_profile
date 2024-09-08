@@ -1,9 +1,8 @@
 # Aliases
 alias reload="source ~/.bash_profile"
-alias pnpm_update="powershell -Command \"iwr https://get.pnpm.io/install.ps1 -useb | iex\" && pnpm -v"
-alias pnpmx="pnpm --exec"
-alias p="p"
 alias g="git"
+alias p="p"
+alias px="pnpm exec"
 
 # determine local package manager and run command with it
 p() {
