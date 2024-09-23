@@ -1,8 +1,12 @@
+#!/bin/bash
+
 # Aliases
 alias reload="source ~/.bash_profile"
 alias g="git"
 alias p="p"
 alias px="pnpm exec"
+alias update_pnpm="corepack prepare pnpm@latest --activate && pnpm --version"
+alias update_node="pnpm env use latest --global && node --version"
 
 # determine local package manager and run command with it
 p() {
@@ -83,11 +87,6 @@ eval "$(starship init bash)"
 
 # scrcpy
 alias mirror="scrcpy --tcpip=192.168.1.71:5555 --turn-screen-off --stay-awake --power-off-on-close"
-
-# Switch node version
-alias oldnode="pnpm env use 8.17.0 --global"
-alias nocapnode="pnpm env use 18.16.0 --global"
-alias newnode="pnpm env use latest --global"
 
 # Fix Steam "Disk Write Error"
 alias fixsteam="rm -rfv D:/SteamLibrary/steamapps/downloading/*"
