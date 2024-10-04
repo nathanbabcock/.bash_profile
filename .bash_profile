@@ -5,8 +5,8 @@ alias reload="source ~/.bash_profile"
 alias g="git"
 alias p="p"
 alias px="pnpm exec"
-alias update_pnpm="corepack prepare pnpm@latest --activate && pnpm --version"
-alias update_node="pnpm env use latest --global && node --version"
+alias pnpm_update="corepack prepare pnpm@latest --activate && pnpm --version"
+alias node_update="pnpm env use latest --global && node --version"
 
 # determine local package manager and run command with it
 p() {
