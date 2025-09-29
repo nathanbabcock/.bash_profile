@@ -104,6 +104,3 @@ eval "$(atuin init bash --disable-up-arrow)"
 
 # https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 echo -e "\033[0;34mBash profile loaded.\033[0m"
-
-# Claude Code in WSL
-alias claude="wsl -d Ubuntu -e bash -lic 'claude'"
