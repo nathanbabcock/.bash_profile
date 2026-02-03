@@ -108,7 +108,6 @@ alias ....="cd ../../.."
 eval "$(atuin init bash --disable-up-arrow)"
 
 # Claude Code
-alias update_claude="pnpm i -g @anthropic-ai/claude-code"
 alias yolo="claude --dangerously-skip-permissions"
 
 # https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
