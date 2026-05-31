@@ -3,8 +3,7 @@
 # Aliases
 alias reload="source ~/.bash_profile"
 alias g="git"
-alias p="p"
-alias px="pnpm exec"
+alias pnpmx="pnpm exec"
 alias pnpm_update="corepack prepare pnpm@latest --activate && pnpm --version"
 alias node_update="pnpm env use latest --global && node --version"
 
@@ -40,7 +39,11 @@ export HISTCONTROL=ignoredups:erasedups  # no duplicate entries
 export HISTSIZE=100000                   # big big history
 export HISTFILESIZE=100000               # big big history
 shopt -s histappend                      # append to history, don't overwrite it
-export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+# Guard so re-sourcing (`reload`) doesn't stack duplicate history commands.
+case "$PROMPT_COMMAND" in
+  *"history -a; history -c; history -r;"*) ;;
+  *) export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND" ;;
+esac
 
 # cd
 alias ..="cd .."
