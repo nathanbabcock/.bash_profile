@@ -23,6 +23,9 @@ p() {
   fi
 }
 
+# Git worktrees helper — `wt` (switch/create), `wt rm`, `wt ls`. See worktrees.sh.
+source "$(dirname "${BASH_SOURCE[0]}")/worktrees.sh"
+
 # Starship shell prompt - https://starship.rs
 eval "$(starship init bash)"
 
@@ -45,6 +48,7 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 
 # Atuin history search & sync
+# shellcheck disable=SC1090
 [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
 eval "$(atuin init bash --disable-up-arrow)"
 
