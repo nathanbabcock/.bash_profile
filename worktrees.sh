@@ -2,7 +2,7 @@
 
 # Git worktrees: sibling worktrees named <repo>.<branch>. Only a shell function
 # can cd the caller, so this lives here rather than as a git alias.
-#   wt [sw|switch] [-c|--create] [--from <ref>] [--code] [--claude [prompt]] [--no-install] <branch>
+#   wt [sw|switch] [-c|--create] [--code] [--claude [prompt]] [--no-install] <branch> [<base>]
 #   wt rm|remove   [-f|--force] [-b|--branch] <branch>
 #   wt ls|list     [<git worktree list args>]
 #   wt help                                          show usage
@@ -22,14 +22,19 @@ wt — git worktree helper. Worktrees are siblings of the main checkout named
 <repo>.<branch> (slashes become dashes), with local .env*/.dev.vars copied in.
 
 Usage:
-  wt [sw|switch] [opts] <branch>   create or switch to a worktree, then cd in
-  wt rm|remove   [opts] <branch>   remove a worktree (and optionally its branch)
-  wt ls|list     [git args]        list worktrees (passthrough to git worktree list)
-  wt help                          show this help
+  wt [sw|switch] [opts] <branch> [<base>]   create or switch to a worktree, cd in
+  wt rm|remove   [opts] <branch>            remove a worktree (and maybe its branch)
+  wt ls|list     [git args]                 list worktrees (git worktree list passthrough)
+  wt help                                   show this help
 
 switch options:
-  -c, --create         create a new branch (else <branch> must already exist)
-      --from <ref>     base ref for the new branch (with -c; default: HEAD)
+  -c, --create         create the worktree (git worktree add). If <branch>
+                       already exists — locally or as a remote/PR branch — it's
+                       checked out and tracked, so commits push straight back;
+                       otherwise a new branch <branch> is forked off <base>
+                       (default: the repo's default branch). Without -c, the
+                       worktree must already exist. <base> is only valid with -c,
+                       and only when forking a new branch.
       --code           open the worktree in VS Code
       --claude [text]  launch claude in the worktree (optional initial prompt)
       --no-install     skip installing dependencies
@@ -52,40 +57,58 @@ _wt_path() {
   echo "$(dirname "$1")/$(basename "$1").${2//\//-}"
 }
 
+# Repo's default branch: origin/HEAD if known, else local main/master, else the
+# current branch. Used as the base when `wt -c <name>` is given no explicit base.
+_wt_default_branch() {
+  local root="$1" ref
+  ref="$(git -C "$root" symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null)" \
+    && { echo "${ref#refs/remotes/origin/}"; return 0; }
+  for ref in main master; do
+    git -C "$root" show-ref --verify --quiet "refs/heads/$ref" && { echo "$ref"; return 0; }
+  done
+  git -C "$root" rev-parse --abbrev-ref HEAD 2>/dev/null
+}
+
 _wt_switch() {
-  local create=0 from="" open_code=0 open_claude=0 claude_prompt="" install=1 branch=""
+  local create=0 base="" open_code=0 open_claude=0 claude_prompt="" install=1 branch="" have_base=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -c|--create) create=1 ;;
-      --from) shift; from="$1" ;;
       --code) open_code=1 ;;
       --claude) open_claude=1; [[ -n "$2" && "$2" != -* ]] && { shift; claude_prompt="$1"; } ;;
       --no-install) install=0 ;;
       -*) echo "wt: unknown option: $1" >&2; return 1 ;;
-      *) branch="$1" ;;
+      *) if [[ -z "$branch" ]]; then branch="$1"; else base="$1"; have_base=1; fi ;;
     esac
     shift
   done
-  [[ -z "$branch" ]] && { echo "wt: usage: wt [-c] [--from <ref>] [--code] [--claude [prompt]] [--no-install] <branch>" >&2; return 1; }
+  [[ -z "$branch" ]] && { echo "wt: usage: wt [-c] [--code] [--claude [prompt]] [--no-install] <branch> [<base>]" >&2; return 1; }
+  [[ "$have_base" == 1 && "$create" != 1 ]] && { echo "wt: <base> only applies with -c (you're switching to an existing worktree)" >&2; return 1; }
 
   local root; root="$(_wt_root)" || { echo "wt: not in a git repo" >&2; return 1; }
   local dest; dest="$(_wt_path "$root" "$branch")"
 
   if [[ -d "$dest" ]]; then
     echo "wt: switching to existing worktree"
+  elif [[ "$create" != 1 ]]; then
+    echo "wt: no worktree for '$branch' — pass -c to create it" >&2
+    return 1
   else
-    if [[ "$create" == 1 ]]; then
-      git -C "$root" show-ref --verify --quiet "refs/heads/$branch" \
-        && { echo "wt: branch '$branch' already exists — omit -c to switch to it" >&2; return 1; }
-      if [[ -n "$from" ]]; then
-        git -C "$root" worktree add -b "$branch" "$dest" "$from" || return 1
+    # -c creates the worktree. If <branch> already exists anywhere — a local
+    # branch, or a remote/PR branch (git DWIMs it into a local tracking branch) —
+    # check it out so commits push straight back; no new branch. Otherwise fork a
+    # new branch <branch> off <base> (default: the repo's default branch).
+    if git -C "$root" show-ref --verify --quiet "refs/heads/$branch" \
+       || git -C "$root" rev-parse --verify --quiet "refs/remotes/origin/$branch" >/dev/null; then
+      [[ "$have_base" == 1 ]] && { echo "wt: branch '$branch' already exists — <base> only applies when forking a new branch" >&2; return 1; }
+      git -C "$root" worktree add "$dest" "$branch" || return 1
+    else
+      [[ -z "$base" ]] && base="$(_wt_default_branch "$root")"
+      if [[ -n "$base" ]]; then
+        git -C "$root" worktree add -b "$branch" "$dest" "$base" || return 1
       else
         git -C "$root" worktree add -b "$branch" "$dest" || return 1
       fi
-    else
-      git -C "$root" show-ref --verify --quiet "refs/heads/$branch" \
-        || { echo "wt: branch '$branch' doesn't exist — pass -c to create it" >&2; return 1; }
-      git -C "$root" worktree add "$dest" "$branch" || return 1
     fi
 
     while IFS= read -r f; do
