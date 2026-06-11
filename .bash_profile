@@ -4,7 +4,7 @@
 alias reload="source ~/.bash_profile && echo -e \"\033[0;34mBash profile reloaded.\033[0m\""
 alias g="git"
 alias px="pnpm dlx"
-alias pnpm-update="corepack prepare pnpm@latest --activate && pnpm --version"
+alias pnpm-update="corepack use pnpm@latest && pnpm --version"
 alias node-update="pnpm env use latest --global && node --version"
 
 # cd
