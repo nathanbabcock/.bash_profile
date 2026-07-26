@@ -6,6 +6,7 @@ alias g="git"
 alias px="pnpm dlx"
 alias pnpm-update="corepack use pnpm@latest && pnpm --version"
 alias node-update="pnpm env use latest --global && node --version"
+alias cc="claude"
 
 # cd
 alias ..="cd .."
