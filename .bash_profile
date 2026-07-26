@@ -4,7 +4,6 @@
 alias reload="source ~/.bash_profile && echo -e \"\033[0;34mBash profile reloaded.\033[0m\""
 alias g="git"
 alias px="pnpm dlx"
-alias pnpm-update="corepack use pnpm@latest && pnpm --version"
 alias node-update="pnpm env use latest --global && node --version"
 alias cc="claude"
 
@@ -18,9 +17,6 @@ alias mirror="scrcpy --tcpip=192.168.1.71:5555 --turn-screen-off --stay-awake --
 
 # Fix Steam "Disk Write Error"
 alias fixsteam="rm -rfv D:/SteamLibrary/steamapps/downloading/*"
-
-# Claude Code
-alias yolo=claude # trying auto mode for a while
 
 # determine local package manager and run command with it
 p() {
