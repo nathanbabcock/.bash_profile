@@ -1,4 +1,4 @@
-#!/bin/bash
+# shellcheck shell=bash
 
 # Login shells read ~/.bash_profile and never ~/.bashrc; interactive non-login
 # shells read only ~/.bashrc. Git Bash always starts a login shell, but VS Code

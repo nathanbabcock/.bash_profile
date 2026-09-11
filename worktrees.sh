@@ -1,4 +1,4 @@
-#!/bin/bash
+# shellcheck shell=bash
 
 # Git worktrees: sibling worktrees named <repo>.<branch>. Only a shell function
 # can cd the caller, so this lives here rather than as a git alias.

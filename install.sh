@@ -8,15 +8,23 @@ script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 # the latter.
 link_file() {
   local target="$1" source_file="$2"
-  local line_to_add="source \"${script_directory}/${source_file}\""
+  # Match on the marker, not the whole line: the same directory spells itself
+  # /c/git/... or C:/git/... depending on how the shell was started, and a path
+  # comparison would add a second copy rather than recognising the first.
+  local marker="# installed by .bash_profile/install.sh (${source_file})"
 
   touch "$target"
-  if grep -qF "$line_to_add" "$target"; then
+  if grep -qF "$marker" "$target"; then
     echo "${target}: already sources ${source_file}. Nothing to do."
     return
   fi
 
-  echo "$line_to_add" >> "$target"
+  # Don't glue onto a last line that has no trailing newline.
+  if [[ -s "$target" && -n "$(tail -c1 "$target")" ]]; then
+    echo >> "$target"
+  fi
+
+  echo "source \"${script_directory}/${source_file}\"  ${marker}" >> "$target"
   echo "${target}: now sources ${source_file}."
 }
 
