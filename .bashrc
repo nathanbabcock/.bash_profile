@@ -14,6 +14,13 @@ alias reload='exec bash -l'
 alias g="git"
 alias px="pnpm dlx"
 alias node-update="pnpm env use latest --global && node --version"
+# `pnpm self-update` pins the current project's pnpm when run inside one, so the
+# global copy is updated from $HOME, and the project's only if there is one.
+pnpm_update() {
+  (cd ~ && pnpm self-update "$@") || return
+  [[ -f package.json ]] && pnpm self-update "$@"
+  pnpm --version
+}
 alias cc="claude"
 
 # cd
