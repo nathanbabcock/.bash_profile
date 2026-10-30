@@ -1,10 +1,11 @@
 # shellcheck shell=bash
 
-# Interactive shell config. Login shells reach this via .bash_profile -> ~/.bashrc.
+# Shell config. Login shells reach this via .bash_profile -> ~/.bashrc.
 
-# Only run for interactive shells. Non-interactive ones (ssh command, scp/rsync,
-# `bash -c`) must not get prompts or stray output on stdout/stderr.
-case $- in *i*) ;; *) return ;; esac
+# Aliases and functions come first, for every shell, so non-interactive ones that
+# source this file get them too, e.g. the one Claude Code runs commands in. They
+# print nothing, so they're safe there. Aliases still only expand where
+# `expand_aliases` is on, so scripts don't see them.
 
 # Aliases
 # Replaces the shell rather than re-sourcing: `source`-ing this file again would
@@ -55,6 +56,11 @@ p() {
   done
   command "${pm:-pnpm}" "$@"
 }
+
+# The rest is only for interactive shells. Non-interactive ones (ssh command,
+# scp/rsync, `bash -c`) must not get prompts, hooks or stray output on
+# stdout/stderr.
+case $- in *i*) ;; *) return ;; esac
 
 # Git worktrees helper — `wt`. See worktrees.sh. Superseded by worktrunk below,
 # which also defines a `wt` function — don't enable both.

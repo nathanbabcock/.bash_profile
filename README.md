@@ -4,7 +4,9 @@ Run `install.sh` to add this config to `~/.bash_profile` and `~/.bashrc`.
 
 - `.bashrc` — the actual config (aliases, functions, history, prompt). Bash reads
   `~/.bashrc` for interactive non-login shells: VS Code's integrated terminal on
-  macOS/Linux, WSL, tmux panes, `docker exec`.
+  macOS/Linux, WSL, tmux panes, `docker exec`. Aliases and functions are defined
+  for every shell that sources it, e.g. Claude Code's; the rest only for
+  interactive ones.
 - `.bash_profile` — a stub that sources `~/.bashrc`. Bash reads `~/.bash_profile`
   *instead of* `~/.bashrc` for login shells, which is what Git Bash on Windows
   always starts.
